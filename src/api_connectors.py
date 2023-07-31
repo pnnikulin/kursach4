@@ -6,9 +6,11 @@ import time
 from abc import abstractmethod, ABC
 from enum import StrEnum
 
+
 class Platform(StrEnum):
-    SuperJob ='SuperJob'
-    HeadHunter ='HeadHunter'
+    SuperJob = 'SuperJob'
+    HeadHunter = 'HeadHunter'
+
 
 class Vacancy:
     def __init__(self, platform: Platform, name: str, url: str, salary: int, description: str = ''):
@@ -61,7 +63,7 @@ class SjApiConnector(ApiConnector):
             #     'salary': vacancy.get('payment_from'),
             #     'link': vacancy.get('link'),
             #     'currency': vacancy.get("currency")
-            #}
+            # }
             super_job_vacancies_list.append(
                 Vacancy(
                     platform=Platform.SuperJob,
@@ -75,50 +77,54 @@ class SjApiConnector(ApiConnector):
 
 class HhApiConnector(ApiConnector):
     """класс для подключения к API HH и парсер вакансий"""
-    def __init__(self, keyword):
-        self.keyword: str = keyword
-        self.api_url_hh = f'https://api.hh.ru/vacancies/'
-        self.header = {"User_Agent": "HH-User-Agent"}
-        self.payload = {
-            "text": self.keyword,
+
+    API_URL = f'https://api.hh.ru/vacancies/'
+    HEADER = {"User_Agent": "HH-User-Agent"}
+
+    def __init__(self):
+        pass
+
+    def get_vacancies(self, keyword):
+        payload = {
+            "text": keyword,
             "per_page": 20,
             "page": 0,
             "archived": False
         }
 
-    def get_vacancies(self, keyword):
         hh_vacancies_list = []
-        hh_data = requests.get(self.api_url_hh, headers=self.header, params=self.payload).json()
+        hh_data = requests.get(self.API_URL, headers=self.HEADER, params=payload).json()
         for vacancy in hh_data['items']:
             try:
-                keys_vacancy = {
-                    'platform': "HeadHunter",
-                    'profession': vacancy.get('name'),
-                    'salary': vacancy.get('salary', 99).get('from', 0),
-                    'link': vacancy.get('alternate_url'),
-                    'currency': vacancy.get('salary').get("currency")
-                }
+                hh_vacancies_list.append(
+                    Vacancy(
+                        platform=Platform.HeadHunter,
+                        name=vacancy.get('name'),
+                        url=vacancy.get('alternate_url'),
+                        salary=vacancy.get('salary', 99).get('from', 0),
+                    )
+                )
             except AttributeError:
-                keys_vacancy = {
-                    'platform': "HeadHunter",
-                    'profession': vacancy.get('name'),
-                    'salary': 0,
-                    'link': vacancy.get('alternate_url'),
-                    'currency': "RUB"
-                }
-            hh_vacancies_list.append(keys_vacancy)
+                hh_vacancies_list.append(
+                    Vacancy(
+                        platform=Platform.HeadHunter,
+                        name=vacancy.get('name'),
+                        url=vacancy.get('alternate_url'),
+                        salary=0,
+                    )
+                )
+
         return hh_vacancies_list
 
 
 sjapi = SjApiConnector()
 result = sjapi.get_vacancies('Python')
-print(result[0] == result[3])
-print(id(result[0]))
-print(id(result[3]))
+#print(result[0] == result[3])
+#print(id(result[0]))
+#print(id(result[3]))
 
-# testhh = HH_API_Connector('python')
-# testhh2 = HH_API_Connector.get_vacancy(testhh)
-
-
+hhapi = HhApiConnector()
+result_hh = hhapi.get_vacancies('Python')
+print(result_hh)
 print(result)
-#print(testhh2)
+# print(testhh2)
