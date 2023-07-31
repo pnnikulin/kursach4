@@ -15,6 +15,7 @@ class JSONSaver(AbstractSaver):
         get_hh_data = api_connectors.HhApiConnector
 
 
+
     def add_vacancy(self):
         pass
 
