@@ -20,8 +20,8 @@ class Vacancy:
         self.salary = salary
         self.description = description
 
-    def __repr__(self):
-        return f'{self.name} ({self.salary})'
+    # def __repr__(self):
+    #     return f'{self.name} ({self.salary})'
 
     def __eq__(self, other):
         return self.salary == other.salary
@@ -116,15 +116,15 @@ class HhApiConnector(ApiConnector):
 
         return hh_vacancies_list
 
-
+#
 sjapi = SjApiConnector()
 result = sjapi.get_vacancies('Python')
-#print(result[0] == result[3])
-#print(id(result[0]))
-#print(id(result[3]))
-
+# #print(result[0] == result[3])
+# #print(id(result[0]))
+# #print(id(result[3]))
+#
 hhapi = HhApiConnector()
 result_hh = hhapi.get_vacancies('Python')
 print(result_hh)
 print(result)
-# print(testhh2)
+# # print(testhh2)
