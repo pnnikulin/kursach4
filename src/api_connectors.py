@@ -26,6 +26,23 @@ class Vacancy:
     def __eq__(self, other):
         return self.salary == other.salary
 
+    def to_dict(self):
+        return {
+            'platform': self.platform,
+            'name': self.name,
+            'url': self.url,
+            'salary': self.salary,
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(
+            platform=data['platform'],
+            name=data['name'],
+            url=data['url'],
+            salary=data['salary'],
+        )
+
 
 class ApiConnector(ABC):
     @abstractmethod
@@ -95,25 +112,14 @@ class HhApiConnector(ApiConnector):
         hh_vacancies_list = []
         hh_data = requests.get(self.API_URL, headers=self.HEADER, params=payload).json()
         for vacancy in hh_data['items']:
-            try:
-                hh_vacancies_list.append(
-                    Vacancy(
+            hh_vacancies_list.append(
+                Vacancy(
                         platform=Platform.HeadHunter,
                         name=vacancy.get('name'),
                         url=vacancy.get('alternate_url'),
-                        salary=vacancy.get('salary', 99).get('from', 0),
+                        salary=vacancy["salary"].get("from", 0) if vacancy.get("salary") else 0
                     )
                 )
-            except AttributeError:
-                hh_vacancies_list.append(
-                    Vacancy(
-                        platform=Platform.HeadHunter,
-                        name=vacancy.get('name'),
-                        url=vacancy.get('alternate_url'),
-                        salary=0,
-                    )
-                )
-
         return hh_vacancies_list
 
 #
