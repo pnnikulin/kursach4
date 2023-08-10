@@ -20,11 +20,11 @@ class Vacancy:
         self.salary = salary
         self.description = description
 
-    # def __repr__(self):
-    #     return f'{self.name} ({self.salary})'
+    def __repr__(self):
+        return f'{self.name} ({self.salary}) {self.description}'
 
     def __eq__(self, other):
-        return self.salary == other.salary
+        return self.url == other.url
 
     def to_dict(self):
         return {
@@ -32,6 +32,7 @@ class Vacancy:
             'name': self.name,
             'url': self.url,
             'salary': self.salary,
+            'description': self.description,
         }
 
     @classmethod
@@ -111,26 +112,29 @@ class HhApiConnector(ApiConnector):
 
         hh_vacancies_list = []
         hh_data = requests.get(self.API_URL, headers=self.HEADER, params=payload).json()
+        #print(hh_data)
         for vacancy in hh_data['items']:
+            #print(vacancy)
             hh_vacancies_list.append(
                 Vacancy(
                         platform=Platform.HeadHunter,
                         name=vacancy.get('name'),
                         url=vacancy.get('alternate_url'),
-                        salary=vacancy["salary"].get("from", 0) if vacancy.get("salary") else 0
+                        salary=vacancy["salary"].get("from", 0) if vacancy.get("salary") else 0,
+                        description=vacancy.get('snippet', {}).get('requirement')
                     )
                 )
         return hh_vacancies_list
 
 #
-sjapi = SjApiConnector()
-result = sjapi.get_vacancies('Python')
-# #print(result[0] == result[3])
-# #print(id(result[0]))
-# #print(id(result[3]))
-#
-hhapi = HhApiConnector()
-result_hh = hhapi.get_vacancies('Python')
-print(result_hh)
-print(result)
+# sjapi = SjApiConnector()
+# result = sjapi.get_vacancies('Python')
+# # #print(result[0] == result[3])
+# # #print(id(result[0]))
+# # #print(id(result[3]))
+# #
+# hhapi = HhApiConnector()
+# result_hh = hhapi.get_vacancies('Python')
+# #print(result_hh)
+#print(result)
 # # print(testhh2)
