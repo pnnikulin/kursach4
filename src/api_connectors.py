@@ -1,8 +1,6 @@
 import json
 import os
 import requests
-import datetime
-import time
 from abc import abstractmethod, ABC
 from enum import StrEnum
 
@@ -17,7 +15,7 @@ class Vacancy:
         self.platform = platform
         self.name = name
         self.url = url
-        self.salary = salary
+        self.salary = salary or 0
         self.description = description
 
     def __repr__(self):
@@ -72,22 +70,19 @@ class SjApiConnector(ApiConnector):
             'page': 0,
             'archive': False
         }
-        superjob_data = requests.get(self.URL, headers=self.HEADERS, params=payload).json()
+
         super_job_vacancies_list = []
+        superjob_data = requests.get(self.URL, headers=self.HEADERS, params=payload).json()
+        # print(superjob_data)
         for vacancy in superjob_data['objects']:
-            # keys_vacancy = {
-            #     'platform': "SuperJob",
-            #     'profession': vacancy.get('profession'),
-            #     'salary': vacancy.get('payment_from'),
-            #     'link': vacancy.get('link'),
-            #     'currency': vacancy.get("currency")
-            # }
+            # print(vacancy)
             super_job_vacancies_list.append(
                 Vacancy(
                     platform=Platform.SuperJob,
                     name=vacancy.get('profession'),
                     url=vacancy.get('link'),
                     salary=vacancy.get('payment_from'),
+                    description=vacancy.get('candidat')
                 )
             )
         return super_job_vacancies_list
@@ -112,18 +107,18 @@ class HhApiConnector(ApiConnector):
 
         hh_vacancies_list = []
         hh_data = requests.get(self.API_URL, headers=self.HEADER, params=payload).json()
-        #print(hh_data)
+        # print(hh_data)
         for vacancy in hh_data['items']:
-            #print(vacancy)
+            # print(vacancy)
             hh_vacancies_list.append(
                 Vacancy(
-                        platform=Platform.HeadHunter,
-                        name=vacancy.get('name'),
-                        url=vacancy.get('alternate_url'),
-                        salary=vacancy["salary"].get("from", 0) if vacancy.get("salary") else 0,
-                        description=vacancy.get('snippet', {}).get('requirement')
-                    )
+                    platform=Platform.HeadHunter,
+                    name=vacancy.get('name'),
+                    url=vacancy.get('alternate_url'),
+                    salary=vacancy["salary"].get("from", 0) if vacancy.get("salary") else 0,
+                    description=vacancy.get('snippet', {}).get('requirement')
                 )
+            )
         return hh_vacancies_list
 
 #
@@ -136,5 +131,5 @@ class HhApiConnector(ApiConnector):
 # hhapi = HhApiConnector()
 # result_hh = hhapi.get_vacancies('Python')
 # #print(result_hh)
-#print(result)
+# print(result)
 # # print(testhh2)
