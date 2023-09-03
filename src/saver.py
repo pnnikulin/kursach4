@@ -5,7 +5,7 @@ import json
 
 from pathlib import Path
 
-PATH = Path(Path(__file__).parent.parent, 'data', 'vacancy.json')
+PATH = Path(Path(__file__).parent.parent, 'data', 'vacancies.json')
 
 
 class AbstractSaver(ABC):

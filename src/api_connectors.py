@@ -1,4 +1,3 @@
-import json
 import os
 import requests
 from abc import abstractmethod, ABC
@@ -40,6 +39,7 @@ class Vacancy:
             name=data['name'],
             url=data['url'],
             salary=data['salary'],
+            description=data['description']
         )
 
 
@@ -73,7 +73,6 @@ class SjApiConnector(ApiConnector):
 
         super_job_vacancies_list = []
         superjob_data = requests.get(self.URL, headers=self.HEADERS, params=payload).json()
-        # print(superjob_data)
         for vacancy in superjob_data['objects']:
             # print(vacancy)
             super_job_vacancies_list.append(
@@ -107,9 +106,7 @@ class HhApiConnector(ApiConnector):
 
         hh_vacancies_list = []
         hh_data = requests.get(self.API_URL, headers=self.HEADER, params=payload).json()
-        # print(hh_data)
         for vacancy in hh_data['items']:
-            # print(vacancy)
             hh_vacancies_list.append(
                 Vacancy(
                     platform=Platform.HeadHunter,
